@@ -1,28 +1,102 @@
 import React from 'react'
-// import Link from 'gatsby-link'
 
-// <pre>starredRepositories: {JSON.stringify(props.starredRepositories, null, '  ')}</pre>
-// <pre>repositoriesContributedTo: {JSON.stringify(props.repositoriesContributedTo, null, '  ')}</pre>
+const GithubUser = props => {
+  const languages = {}
 
-const GithubUser = (props) => {
-  return <div style={{ padding: '1em', margin: '1em', border: 'thin solid blue' }}>
-    <h2>{props.name || props.login}</h2>
-    {props.bio && <p>{props.bio}</p>}
-    <dl>
-      <dt>Location</dt>
-      <dd>{props.location}</dd>
-      <dt>Site web</dt>
-      <dd>{props.websiteUrl}</dd>
-      <dt>Créé</dt>
-      <dd>{props.createdAt}</dd>
-      <dt>starredRepositories</dt>
-      <dd>{props.starredRepositories && props.starredRepositories.edges.length}</dd>
-      <dt>repositoriesContributedTo</dt>
-      <dd>{props.repositoriesContributedTo && props.repositoriesContributedTo.edges.length}</dd>
-    </dl>
-    {props.isHireable && <p>Disponible pour travailler</p>}
+  props.repositoriesContributedTo.edges.forEach(({ node }) => {
+    const primaryLanguage =
+      node && node.primaryLanguage && node.primaryLanguage.name
+    if (!primaryLanguage) {
+      return
+    }
+    if (!languages[primaryLanguage]) {
+      languages[primaryLanguage] = 0
+    }
+    ++languages[primaryLanguage]
+  })
 
-  </div>
+  const l2 = []
+  let r
+  for (r in languages) {
+    l2.push([r, languages[r]])
+  }
+
+  // sort by number of appearances
+  const l3 = l2
+    .sort((a, b) => {
+      if (a[1] > b[1]) {
+        return 1
+      }
+      if (a[1] < b[1]) {
+        return -1
+      }
+      return 0
+    })
+    .reverse()
+    // convert to a string
+    .map(x => `${x[0]} (${x[1]})`)
+    .join(', ')
+
+  return (
+    <div style={{ padding: '1em', margin: '1em', border: 'thin solid blue' }}>
+      {/* if props.name is falsy, show props.login */}
+      <h2>{props.name || props.login}</h2>
+      <a
+        target="_blank"
+        href={`https://github.com/${props.login}`}
+      >{`https://github.com/${props.login}`}</a>
+      <a target="_blank" href={`https://github.com/${props.login}`}>
+        <img
+          src={`https://avatars3.githubusercontent.com/u/${
+            props.databaseId
+          }?s=460&v=4`}
+          alt={`Avatar de ${props.name || props.login}`}
+        />
+      </a>
+      {/* if props.bio is truthy, show it in a paragraph */}
+      {props.bio && <p>{props.bio}</p>}
+      <dl>
+        <dt>Location</dt>
+        <dd>{props.location}</dd>
+
+        {props.websiteUrl && (
+          <span>
+            <dt>Site web</dt>
+            <dd>{props.websiteUrl}</dd>
+          </span>
+        )}
+        <dt>Créé</dt>
+        <dd>{props.createdAt}</dd>
+
+        {/* Here, we're testing length > 0
+            since the number 0 is not falsy in this context.
+            Otherwise, 0 would be shown instead of nothing or the following span. */}
+        {props.starredRepositories &&
+          props.starredRepositories.edges.length > 0 && (
+            <span>
+              <dt>Étoiles</dt>
+              {/* Here, we want it displayed, even if it's 0 although the previous test would prevent 0 */}
+              <dd>{props.starredRepositories.edges.length} dépots</dd>
+            </span>
+          )}
+
+        {props.repositoriesContributedTo &&
+          props.repositoriesContributedTo.edges.length > 0 && (
+            <span>
+              <dt>Contribué à</dt>
+              <dd>{props.repositoriesContributedTo.edges.length} dépots</dd>
+              {l3 && (
+                <span>
+                  <dt>Langages</dt>
+                  <dd>{l3}</dd>
+                </span>
+              )}
+            </span>
+          )}
+      </dl>
+      {props.isHireable && <p>Disponible pour travailler</p>}
+    </div>
+  )
 }
 
 export default GithubUser
