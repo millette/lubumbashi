@@ -1,42 +1,6 @@
 import React from 'react'
 
 const GithubUser = props => {
-  const languages = {}
-
-  props.repositoriesContributedTo.edges.forEach(({ node }) => {
-    const primaryLanguage =
-      node && node.primaryLanguage && node.primaryLanguage.name
-    if (!primaryLanguage) {
-      return
-    }
-    if (!languages[primaryLanguage]) {
-      languages[primaryLanguage] = 0
-    }
-    ++languages[primaryLanguage]
-  })
-
-  const l2 = []
-  let r
-  for (r in languages) {
-    l2.push([r, languages[r]])
-  }
-
-  // sort by number of appearances
-  const l3 = l2
-    .sort((a, b) => {
-      if (a[1] > b[1]) {
-        return 1
-      }
-      if (a[1] < b[1]) {
-        return -1
-      }
-      return 0
-    })
-    .reverse()
-    // convert to a string
-    .map(x => `${x[0]} (${x[1]})`)
-    .join(', ')
-
   return (
     <div style={{ padding: '1em', margin: '1em', border: 'thin solid blue' }}>
       {/* if props.name is falsy, show props.login */}
@@ -85,10 +49,10 @@ const GithubUser = props => {
             <span>
               <dt>Contribué à</dt>
               <dd>{props.repositoriesContributedTo.edges.length} dépots</dd>
-              {l3 && (
+              {props.languages && (
                 <span>
                   <dt>Langages</dt>
-                  <dd>{l3}</dd>
+                  <dd>{props.languages}</dd>
                 </span>
               )}
             </span>
