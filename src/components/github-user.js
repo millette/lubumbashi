@@ -7,9 +7,10 @@ const GithubUser = props => {
       <h2>{props.name || props.login}</h2>
       <a
         target="_blank"
+        rel="noopener noreferrer"
         href={`https://github.com/${props.login}`}
       >{`https://github.com/${props.login}`}</a>
-      <a target="_blank" href={`https://github.com/${props.login}`}>
+      <a target="_blank" rel="noopener noreferrer" href={`https://github.com/${props.login}`}>
         <img
           src={`https://avatars3.githubusercontent.com/u/${
             props.databaseId
